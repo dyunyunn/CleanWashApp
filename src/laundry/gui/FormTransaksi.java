@@ -182,6 +182,7 @@ public class FormTransaksi extends JFrame {
         }
     }
 
+    
     // --- LOGIKA UNTUK MENGHAPUS DATA (DELETE) ---
     private void hapusData() {
         // Mengecek baris ke berapa yang sedang diklik (disorot) oleh kasir di tabel
@@ -192,7 +193,7 @@ public class FormTransaksi extends JFrame {
             // [MEMENUHI SYARAT: Dialog konfirmasi Yes/No]
             int konfirmasi = JOptionPane.showConfirmDialog(this, "Yakin ingin menghapus pesanan ini?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
             
-            // Jika kasir menekan tombol "Yes"
+            // Jika kasir menekan tombol "Yes" 
             if (konfirmasi == JOptionPane.YES_OPTION) {
                 daftarLayanan.remove(row); // Menghapus dari memori Collection
                 model.removeRow(row);      // Menghapus dari tampilan tabel GUI
