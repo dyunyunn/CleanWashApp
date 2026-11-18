@@ -1,37 +1,49 @@
 package laundry.model;
 
+/**
+ * Kelas LayananKiloan merupakan kelas turunan (subclass) dari kelas induk Layanan.
+ * Kelas ini mengimplementasikan interface EstimasiWaktu untuk menentukan durasi pengerjaan cucian kiloan.
+ */
 public class LayananKiloan extends Layanan implements EstimasiWaktu {
-    
-    private double berat;
-    private boolean isExpress; // Menentukan paketan
 
-    // Konstruktor sekarang meminta status express
-    public LayananKiloan(String namaPelanggan, double hargaDasar, double berat, boolean isExpress) {
-        super(namaPelanggan, hargaDasar);
-        this.berat = berat;
-        this.isExpress = isExpress;
+    /**
+     * Constructor untuk menginisialisasi atribut LayananKiloan.
+     * Menggunakan kata kunci 'super' untuk meneruskan data ke constructor kelas induk (Layanan).
+     */
+    public LayananKiloan(String namaPelanggan, double kuantitas, String jenisPaket) {
+        super(namaPelanggan, kuantitas, jenisPaket);
     }
 
-    // [MEMENUHI SYARAT: Polimorfisme - Overriding]
+    /**
+     * Method hitungBiaya (Overriding):
+     * Mengimplementasikan dan mengubah logika perhitungan biaya khusus untuk layanan kiloan.
+     * Tarif Reguler: Rp 5.000 per kg
+     * Tarif Express: Rp 7.000 per kg (dihitung dari kuantitas dikali tarif)
+     */
     @Override
     public double hitungBiaya() {
-        double total = hargaDasar * berat;
-        // Jika express, tambah biaya layanan kilat Rp 5.000
-        return isExpress ? total + 5000 : total; 
+        // Menentukan tarif berdasarkan jenis paket yang dipilih menggunakan ternary operator
+        double tarif = jenisPaket.equals("Express") ? 7000 : 5000;
+        return kuantitas * tarif;
     }
 
-    // [MEMENUHI SYARAT: Polimorfisme - Overloading]
-    public double hitungBiaya(double diskon) {
-        return hitungBiaya() - diskon;
+    /**
+     * Method hitungBiaya dengan parameter tambahan (Overloading):
+     * Digunakan jika ada fitur hitung biaya yang memperhitungkan diskon (persen).
+     */
+    public double hitungBiaya(double persenDiskon) {
+        double totalAwal = hitungBiaya(); // Memanggil method hitungBiaya() di atas
+        double potongan = totalAwal * (persenDiskon / 100);
+        return totalAwal - potongan;
     }
 
-    // [MEMENUHI SYARAT: Implementasi Interface]
+    /**
+     * Method getEstimasiSelesai (Implementasi dari Interface EstimasiWaktu):
+     * Menentukan estimasi lama pengerjaan berdasarkan jenis paket kiloan.
+     */
     @Override
     public String getEstimasiSelesai() {
-        // Teks berubah dinamis tergantung pilihan kasir
-        return isExpress ? "1 Hari (Express)" : "3 Hari (Reguler)";
+        // Paket Express selesai dalam 1 hari, paket Reguler selesai dalam 2 hari
+        return jenisPaket.equals("Express") ? "1 Hari Selesai" : "2 Hari Selesai";
     }
-    
-    public double getBerat() { return berat; }
-    public void setBerat(double berat) { this.berat = berat; }
 }

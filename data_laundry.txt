@@ -1,0 +1,2 @@
+enit,Kiloan,6.0,60000.0,1 Hari Selesai
+enit,Kiloan,3.0,30000.0,1 Hari Selesai
