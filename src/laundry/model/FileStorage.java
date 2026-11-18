@@ -5,21 +5,17 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 /**
- * Kelas FileStorage berfungsi untuk menangani penyimpanan data transaksi 
- * secara permanen ke dalam file teks (.txt) di komputer.
+ * Kelas FileStorage menangani penyimpanan data transaksi secara permanen 
+ * ke dalam file teks eksternal (data_laundry.txt).
  */
 public class FileStorage {
-    // Nama file tempat data transaksi akan disimpan
     private static final String FILE_NAME = "data_laundry.txt";
 
-    /**
-     * Method statis untuk menulis dan menyimpan data baris transaksi baru ke file.
-     * Menggunakan FileWriter dengan mode 'append' (true) agar data lama tidak tertimpa.
-     */
     public static void simpanData(String barisData) {
+        // Menggunakan mode append (true) agar data baru ditambahkan di bawahnya (tidak menimpa)
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_NAME, true))) {
             bw.write(barisData);
-            bw.newLine(); // Membuat baris baru di dalam file txt
+            bw.newLine();
         } catch (IOException e) {
             System.out.println("Gagal menyimpan file: " + e.getMessage());
         }

@@ -1,36 +1,27 @@
 package laundry.model;
 
 /**
- * Kelas LayananSatuan merupakan kelas turunan (subclass) dari kelas induk Layanan.
- * Kelas ini menghitung biaya cucian berdasarkan jumlah barang (satuan/pcs).
+ * [KELAS TURUNAN / SUBCLASS]
  */
 public class LayananSatuan extends Layanan implements EstimasiWaktu {
-
-    /**
-     * Constructor turunan yang menggunakan 'super' untuk mewarisi data dari kelas induk.
-     */
-    public LayananSatuan(String namaPelanggan, double kuantitas, String jenisPaket) {
-        super(namaPelanggan, kuantitas, jenisPaket);
+    
+    // [CONSTRUCTOR]
+    public LayananSatuan(Pelanggan pelanggan, double kuantitas, String jenisPaket) {
+        super(pelanggan, kuantitas, jenisPaket);
     }
 
     /**
-     * Method hitungBiaya (Overriding):
-     * Menghitung total biaya khusus layanan satuan per item/pcs.
-     * Tarif Reguler: Rp 10.000 per pcs
-     * Tarif Express: Rp 15.000 per pcs
+     * [METHOD OVERRIDING]
+     * Menghitung total biaya khusus tarif satuan/pcs.
      */
     @Override
     public double hitungBiaya() {
-        double tarifPerPcs = jenisPaket.equals("Express") ? 15000 : 10000;
+        double tarifPerPcs = jenisPaket.equals("Express") ? 15000 * 1.5 : 15000;
         return kuantitas * tarifPerPcs;
     }
 
-    /**
-     * Method getEstimasiSelesai (Implementasi dari Interface EstimasiWaktu):
-     * Menentukan estimasi waktu pengerjaan untuk layanan satuan.
-     */
     @Override
     public String getEstimasiSelesai() {
-        return jenisPaket.equals("Express") ? "1 Hari Selesai" : "2 Hari Selesai";
+        return jenisPaket.equals("Express") ? "1 Hari Selesai" : "3 Hari Selesai";
     }
 }

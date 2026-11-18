@@ -1,30 +1,20 @@
 package laundry.model;
 
 /**
- * Kelas Pelanggan merepresentasikan data identitas pelanggan laundry.
+ * [ENTITAS KEDUA / RELASI KELAS]
+ * Kelas ini membuktikan penerapan relasi antar-objek (Has-A relationship).
  */
 public class Pelanggan {
+    // [ATRIBUT]
     private String nama;
-    private String noTelp;
 
-    public Pelanggan(String nama, String noTelp) {
+    // [CONSTRUCTOR] Ini yang dicari oleh FormTransaksi (Menerima parameter String)
+    public Pelanggan(String nama) {
         this.nama = nama;
-        this.noTelp = noTelp;
     }
 
+    // [GETTER]
     public String getNama() {
         return nama;
-    }
-
-    public void setNama(String nama) {
-        this.nama = nama;
-    }
-
-    public String getNoTelp() {
-        return noTelp;
-    }
-
-    public void setNoTelp(String noTelp) {
-        this.noTelp = noTelp;
     }
 }

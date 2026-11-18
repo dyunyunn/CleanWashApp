@@ -1,2 +1,3 @@
-enit,Kiloan,6.0,60000.0,1 Hari Selesai
-enit,Kiloan,3.0,30000.0,1 Hari Selesai
+grey,Satuan,5.0,Rp 112.500,1 Hari Selesai
+rosita,Kiloan,4.0,Rp 24.000,3 Hari Selesai
+yuni,Kiloan,6.0,Rp 36.000,3 Hari Selesai

@@ -1,24 +1,29 @@
 package laundry.model;
 
+/**
+ * [KELAS INDUK / ABSTRACT CLASS]
+ * Menjadi blueprint dasar untuk setiap jenis layanan laundry.
+ */
 public abstract class Layanan {
-    // Variabel utama yang akan diwariskan ke kelas anak (Kiloan & Satuan)
-    protected String namaPelanggan;
+    // [RELASI ENTITAS / HAS-A RELATIONSHIP]
+    // Menggunakan objek Pelanggan (Entitas Kedua), bukan sekadar String biasa
+    protected Pelanggan pelanggan; 
     protected double kuantitas;
     protected String jenisPaket;
 
-    // Constructor induk untuk menerima data transaksi
-    public Layanan(String namaPelanggan, double kuantitas, String jenisPaket) {
-        this.namaPelanggan = namaPelanggan;
+    // [CONSTRUCTOR]
+    public Layanan(Pelanggan pelanggan, double kuantitas, String jenisPaket) {
+        this.pelanggan = pelanggan;
         this.kuantitas = kuantitas;
         this.jenisPaket = jenisPaket;
     }
 
-    // Method abstrak (wajib di-override oleh kelas anak untuk polimorfisme)
+    // [METHOD ABSTRAK] Wajib di-override oleh kelas turunannya
     public abstract double hitungBiaya();
 
-    // Getter dan Setter standar
-    public String getNamaPelanggan() {
-        return namaPelanggan;
+    // [GETTER]
+    public Pelanggan getPelanggan() {
+        return pelanggan;
     }
 
     public double getKuantitas() {
