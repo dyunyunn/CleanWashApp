@@ -1,0 +1,3 @@
+PLG-001;grey;01234512345678;jl tirto
+PLG-002;yunita;0812345678910;jl bulus
+PLG-003;rosita;01298765431234;jl jurbel

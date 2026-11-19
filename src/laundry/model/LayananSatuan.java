@@ -1,27 +1,33 @@
 package laundry.model;
 
 /**
- * [KELAS TURUNAN / SUBCLASS]
+ * [PEWARISAN / SUBCLASS 2]
+ * Turunan dari kelas abstrak Layanan untuk cucian per potong (pcs).
  */
 public class LayananSatuan extends Layanan implements EstimasiWaktu {
-    
-    // [CONSTRUCTOR]
-    public LayananSatuan(Pelanggan pelanggan, double kuantitas, String jenisPaket) {
-        super(pelanggan, kuantitas, jenisPaket);
+    public static final double TARIF_REGULER = 15000.0;
+    public static final double TARIF_EXPRESS = 22500.0;
+
+    // [CONSTRUCTOR] Menggunakan super() untuk memanggil konstruktor kelas induk
+    public LayananSatuan(double kuantitas, String jenisPaket) throws CucianInvalidException {
+        super(kuantitas, jenisPaket);
     }
 
-    /**
-     * [METHOD OVERRIDING]
-     * Menghitung total biaya khusus tarif satuan/pcs.
-     */
+    // [POLIMORFISME - METHOD OVERRIDING] Tarif khusus layanan satuan
     @Override
     public double hitungBiaya() {
-        double tarifPerPcs = jenisPaket.equals("Express") ? 15000 * 1.5 : 15000;
-        return kuantitas * tarifPerPcs;
+        double tarif = jenisPaket.equals("Express") ? TARIF_EXPRESS : TARIF_REGULER;
+        return kuantitas * tarif;
     }
 
     @Override
+    public String getTipeLayanan() {
+        return "Satuan";
+    }
+
+    // [IMPLEMENTASI INTERFACE EstimasiWaktu]
+    @Override
     public String getEstimasiSelesai() {
-        return jenisPaket.equals("Express") ? "1 Hari Selesai" : "3 Hari Selesai";
+        return jenisPaket.equals("Express") ? "1 Hari Selesai" : "2 Hari Selesai";
     }
 }

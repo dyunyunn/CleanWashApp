@@ -1,7 +1,10 @@
 package laundry.model;
 
-// [MEMENUHI SYARAT: Minimal 1 interface yang diimplementasikan lebih dari satu kelas]
+/**
+ * [ABSTRAKSI - INTERFACE]
+ * Kontrak perilaku untuk menghitung estimasi waktu pengerjaan laundry.
+ * Diimplementasikan oleh lebih dari satu kelas (LayananKiloan & LayananSatuan).
+ */
 public interface EstimasiWaktu {
-    // Method di dalam interface otomatis bersifat public dan abstrak
     String getEstimasiSelesai();
 }

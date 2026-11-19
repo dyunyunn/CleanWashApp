@@ -1,12 +1,14 @@
 package laundry.model;
 
-// [MEMENUHI SYARAT: Minimal 1 custom exception]
-// Kelas ini kita buat sendiri untuk menangani error khusus aplikasi Laundry, 
-// misalnya jika kasir tidak sengaja menginputkan harga atau berat cucian yang minus (negatif).
+/**
+ * [CUSTOM EXCEPTION]
+ * Exception khusus untuk menangani kesalahan input bisnis pada aplikasi CleanWashApp
+ * (seperti nama kosong, berat <= 0, nomor HP tidak valid, atau diskon di luar 0-100%).
+ */
 public class CucianInvalidException extends Exception {
-    
-    // Konstruktor yang menerima pesan error
+
+    // [CONSTRUCTOR] Meneruskan pesan error ke kelas induk Exception
     public CucianInvalidException(String pesan) {
-        super(pesan); // Mengirim pesan error ke kelas induk (Exception bawaan Java)
+        super(pesan);
     }
 }

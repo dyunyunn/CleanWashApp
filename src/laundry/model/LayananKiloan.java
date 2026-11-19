@@ -1,29 +1,31 @@
 package laundry.model;
 
 /**
- * [KELAS TURUNAN / SUBCLASS]
- * Menginduk ke Layanan dan mengimplementasikan antarmuka EstimasiWaktu.
+ * [PEWARISAN / SUBCLASS 1]
+ * Turunan dari kelas abstrak Layanan dan mengimplementasikan interface EstimasiWaktu.
  */
 public class LayananKiloan extends Layanan implements EstimasiWaktu {
-    
-    // [CONSTRUCTOR] Meneruskan objek Entitas Pelanggan ke kelas Induk (super)
-    public LayananKiloan(Pelanggan pelanggan, double kuantitas, String jenisPaket) {
-        super(pelanggan, kuantitas, jenisPaket);
+    public static final double TARIF_REGULER = 6000.0;
+    public static final double TARIF_EXPRESS = 11000.0;
+
+    // [CONSTRUCTOR] Menggunakan super() untuk memanggil konstruktor kelas induk
+    public LayananKiloan(double kuantitas, String jenisPaket) throws CucianInvalidException {
+        super(kuantitas, jenisPaket);
     }
 
-    /**
-     * [METHOD OVERRIDING] 
-     * Menghitung total biaya khusus tarif kiloan.
-     */
+    // [POLIMORFISME - METHOD OVERRIDING] Tarif khusus layanan kiloan
     @Override
     public double hitungBiaya() {
-        double tarif = jenisPaket.equals("Express") ? 11000 : 6000;
+        double tarif = jenisPaket.equals("Express") ? TARIF_EXPRESS : TARIF_REGULER;
         return kuantitas * tarif;
     }
 
-    /**
-     * [IMPLEMENTASI INTERFACE]
-     */
+    @Override
+    public String getTipeLayanan() {
+        return "Kiloan";
+    }
+
+    // [IMPLEMENTASI INTERFACE EstimasiWaktu]
     @Override
     public String getEstimasiSelesai() {
         return jenisPaket.equals("Express") ? "1 Hari Selesai" : "3 Hari Selesai";
