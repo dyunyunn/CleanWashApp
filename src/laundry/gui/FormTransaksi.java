@@ -1,66 +1,107 @@
 package laundry.gui;
 
-import laundry.controller.LaundryController;
-import laundry.model.CucianInvalidException;
-import laundry.model.Pelanggan;
-import laundry.model.Transaksi;
-
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.List;
 import java.util.Locale;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
+import laundry.controller.LaundryController;
+import laundry.model.CucianInvalidException;
+import laundry.model.Pelanggan;
+import laundry.model.Transaksi;
 
-/**
- * [MVC - VIEW / HALAMAN 4]
- * Halaman CRUD lengkap dan Pencarian untuk Entitas 2 (Transaksi Laundry).
- * Menerapkan variasi komponen Swing lengkap: JComboBox, JRadioButton, JCheckBox, JSpinner,
- * JTextField, JTable, JMenuBar, serta perhitungan estimasi biaya secara real-time.
- */
+// Inheritance: mewarisi JFrame untuk halaman CRUD Entitas Transaksi (MVC - View halaman 4)
 public class FormTransaksi extends JFrame {
+    private static final long serialVersionUID = 1L;
 
-    // [ATRIBUT KOMPONEN INPUT BERVARIASI]
+    // Encapsulation, Komposisi MVC, & Generics: komponen input bervariasi berakses private
     private final LaundryController controller;
-    private JTextField txtIdTransaksi, txtCari;
+    private JTextField txtIdTransaksi;
+    private JTextField txtCari;
     private JComboBox<Pelanggan> cbPelanggan;
     private JComboBox<String> cbTipe;
-    private JRadioButton rbReguler, rbExpress;
+    private JRadioButton rbReguler;
+    private JRadioButton rbExpress;
     private ButtonGroup grupPaket;
-    private JSpinner spnKuantitas, spnDiskon;
+    private JSpinner spnKuantitas;
+    private JSpinner spnDiskon;
     private JCheckBox chkAntarJemput;
     private JLabel lblEstimasiBiaya;
 
-    // Tombol & Tabel
-    private JButton btnTambah, btnUbah, btnHapus, btnBersihkan, btnKembali;
+    // Komponen tombol aksi dan tabel transaksi
+    private JButton btnTambah;
+    private JButton btnUbah;
+    private JButton btnHapus;
+    private JButton btnBersihkan;
+    private JButton btnKembali;
     private JTable tabelTransaksi;
     private DefaultTableModel modelTabel;
 
-    // Menu Bar
-    private JMenuItem itemMenuUtama, itemPelanggan, itemLogOut, itemKeluar, itemTentang;
+    // Komponen menu navigasi bar
+    private JMenuItem itemMenuUtama;
+    private JMenuItem itemPelanggan;
+    private JMenuItem itemLogOut;
+    private JMenuItem itemKeluar;
+    private JMenuItem itemTentang;
 
+    // Constructor default (Overloading & Chaining): memanggil konstruktor utama dengan null agar kompatibel WindowBuilder
+    public FormTransaksi() {
+        this(null);
+    }
+
+    // Constructor berparameter (Overloading): menyiapkan GUI, event, daftar pelanggan, tabel transaksi, dan estimasi awal
     public FormTransaksi(LaundryController controller) {
         this.controller = controller;
         inisialisasiGUI();
         pasangEvent();
-        muatComboPelanggan();
-        muatTabel(controller.getDaftarTransaksi());
-        perbaruiEstimasi();
+        if (this.controller != null) {
+            muatComboPelanggan();
+            muatTabel(this.controller.getDaftarTransaksi());
+            perbaruiEstimasi();
+        }
     }
 
+    // Void instance method (private): menyusun antarmuka form 2 kolom (GridBagLayout), tombol CRUD, pencarian, dan JTable
     private void inisialisasiGUI() {
         setTitle("Kelola Transaksi Laundry - CleanWashApp");
         setSize(920, 620);
         setMinimumSize(new Dimension(820, 540));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setLayout(new BorderLayout(10, 10));
 
-        // --- [JMenuBar KONSISTEN ANTARHALAMAN] ---
+        // Menu bar navigasi antarhalaman
         JMenuBar menuBar = new JMenuBar();
         JMenu menuNavigasi = new JMenu("Menu");
         itemMenuUtama = new JMenuItem("Menu Utama");
@@ -82,45 +123,79 @@ public class FormTransaksi extends JFrame {
         menuBar.add(menuBantuan);
         setJMenuBar(menuBar);
 
-        // --- PANEL UTARA (Form 2 Kolom GridBagLayout + Tombol) ---
+        // Panel utama dengan BorderLayout
+        JPanel panelUtama = new JPanel(new BorderLayout(10, 10));
+        setContentPane(panelUtama);
 
+        // Panel atas menampung form input 2 kolom dan tombol aksi
         JPanel panelUtara = new JPanel(new BorderLayout());
 
         JPanel panelForm = new JPanel(new GridBagLayout());
         panelForm.setBorder(BorderFactory.createTitledBorder("Form Input Transaksi Laundry"));
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 10, 5, 10);
-        gbc.anchor = GridBagConstraints.WEST;
 
-        // --- KOLOM KIRI FORM ---
-        // Baris 0: ID Transaksi
-        gbc.gridx = 0; gbc.gridy = 0;
-        panelForm.add(new JLabel("ID Transaksi:"), gbc);
-        gbc.gridx = 1;
+        // Kolom kiri baris 0: ID transaksi otomatis (read-only)
+        JLabel lblIdTransaksi = new JLabel("ID Transaksi:");
+        GridBagConstraints gbcLblId = new GridBagConstraints();
+        gbcLblId.insets = new Insets(5, 10, 5, 10);
+        gbcLblId.anchor = GridBagConstraints.WEST;
+        gbcLblId.gridx = 0;
+        gbcLblId.gridy = 0;
+        panelForm.add(lblIdTransaksi, gbcLblId);
+
         txtIdTransaksi = new JTextField("(Otomatis)", 15);
         txtIdTransaksi.setEditable(false);
-        panelForm.add(txtIdTransaksi, gbc);
+        GridBagConstraints gbcTxtId = new GridBagConstraints();
+        gbcTxtId.insets = new Insets(5, 10, 5, 10);
+        gbcTxtId.anchor = GridBagConstraints.WEST;
+        gbcTxtId.gridx = 1;
+        gbcTxtId.gridy = 0;
+        panelForm.add(txtIdTransaksi, gbcTxtId);
 
-        // Baris 1: Pelanggan (JComboBox<Pelanggan> - Relasi Objek)
-        gbc.gridx = 0; gbc.gridy = 1;
-        panelForm.add(new JLabel("Pelanggan:"), gbc);
-        gbc.gridx = 1;
+        // Kolom kiri baris 1: pilihan objek Pelanggan menggunakan JComboBox
+        JLabel lblPelanggan = new JLabel("Pelanggan:");
+        GridBagConstraints gbcLblPelanggan = new GridBagConstraints();
+        gbcLblPelanggan.insets = new Insets(5, 10, 5, 10);
+        gbcLblPelanggan.anchor = GridBagConstraints.WEST;
+        gbcLblPelanggan.gridx = 0;
+        gbcLblPelanggan.gridy = 1;
+        panelForm.add(lblPelanggan, gbcLblPelanggan);
+
         cbPelanggan = new JComboBox<>();
         cbPelanggan.setPreferredSize(new Dimension(210, 25));
-        panelForm.add(cbPelanggan, gbc);
+        GridBagConstraints gbcCbPelanggan = new GridBagConstraints();
+        gbcCbPelanggan.insets = new Insets(5, 10, 5, 10);
+        gbcCbPelanggan.anchor = GridBagConstraints.WEST;
+        gbcCbPelanggan.gridx = 1;
+        gbcCbPelanggan.gridy = 1;
+        panelForm.add(cbPelanggan, gbcCbPelanggan);
 
-        // Baris 2: Tipe Layanan (JComboBox<String>)
-        gbc.gridx = 0; gbc.gridy = 2;
-        panelForm.add(new JLabel("Tipe Layanan:"), gbc);
-        gbc.gridx = 1;
+        // Kolom kiri baris 2: pilihan tipe layanan Kiloan atau Satuan
+        JLabel lblTipe = new JLabel("Tipe Layanan:");
+        GridBagConstraints gbcLblTipe = new GridBagConstraints();
+        gbcLblTipe.insets = new Insets(5, 10, 5, 10);
+        gbcLblTipe.anchor = GridBagConstraints.WEST;
+        gbcLblTipe.gridx = 0;
+        gbcLblTipe.gridy = 2;
+        panelForm.add(lblTipe, gbcLblTipe);
+
         cbTipe = new JComboBox<>(new String[]{"Kiloan", "Satuan"});
         cbTipe.setPreferredSize(new Dimension(150, 25));
-        panelForm.add(cbTipe, gbc);
+        GridBagConstraints gbcCbTipe = new GridBagConstraints();
+        gbcCbTipe.insets = new Insets(5, 10, 5, 10);
+        gbcCbTipe.anchor = GridBagConstraints.WEST;
+        gbcCbTipe.gridx = 1;
+        gbcCbTipe.gridy = 2;
+        panelForm.add(cbTipe, gbcCbTipe);
 
-        // Baris 3: Pilihan Paket (JRadioButton + ButtonGroup)
-        gbc.gridx = 0; gbc.gridy = 3;
-        panelForm.add(new JLabel("Pilihan Paket:"), gbc);
-        gbc.gridx = 1;
+        // Kolom kiri baris 3: pilihan paket Reguler/Express dengan JRadioButton dan ButtonGroup
+        JLabel lblPaket = new JLabel("Pilihan Paket:");
+        GridBagConstraints gbcLblPaket = new GridBagConstraints();
+        gbcLblPaket.insets = new Insets(5, 10, 5, 10);
+        gbcLblPaket.anchor = GridBagConstraints.WEST;
+        gbcLblPaket.gridx = 0;
+        gbcLblPaket.gridy = 3;
+        panelForm.add(lblPaket, gbcLblPaket);
+
         JPanel panelRadio = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         rbReguler = new JRadioButton("Reguler", true);
         rbExpress = new JRadioButton("Express");
@@ -129,46 +204,96 @@ public class FormTransaksi extends JFrame {
         grupPaket.add(rbExpress);
         panelRadio.add(rbReguler);
         panelRadio.add(rbExpress);
-        panelForm.add(panelRadio, gbc);
+        GridBagConstraints gbcPanelRadio = new GridBagConstraints();
+        gbcPanelRadio.insets = new Insets(5, 10, 5, 10);
+        gbcPanelRadio.anchor = GridBagConstraints.WEST;
+        gbcPanelRadio.gridx = 1;
+        gbcPanelRadio.gridy = 3;
+        panelForm.add(panelRadio, gbcPanelRadio);
 
-        // --- KOLOM KANAN FORM ---
-        // Baris 0: Berat / Jumlah (JSpinner)
-        gbc.gridx = 2; gbc.gridy = 0;
-        panelForm.add(new JLabel("Berat (kg) / Jumlah:"), gbc);
-        gbc.gridx = 3;
+        // Kolom kanan baris 0: input berat atau jumlah item menggunakan JSpinner
+        JLabel lblKuantitas = new JLabel("Berat (kg) / Jumlah:");
+        GridBagConstraints gbcLblKuantitas = new GridBagConstraints();
+        gbcLblKuantitas.insets = new Insets(5, 10, 5, 10);
+        gbcLblKuantitas.anchor = GridBagConstraints.WEST;
+        gbcLblKuantitas.gridx = 2;
+        gbcLblKuantitas.gridy = 0;
+        panelForm.add(lblKuantitas, gbcLblKuantitas);
+
         spnKuantitas = new JSpinner(new SpinnerNumberModel(1.0, 0.5, 100.0, 0.5));
         spnKuantitas.setPreferredSize(new Dimension(100, 25));
-        panelForm.add(spnKuantitas, gbc);
+        GridBagConstraints gbcSpnKuantitas = new GridBagConstraints();
+        gbcSpnKuantitas.insets = new Insets(5, 10, 5, 10);
+        gbcSpnKuantitas.anchor = GridBagConstraints.WEST;
+        gbcSpnKuantitas.gridx = 3;
+        gbcSpnKuantitas.gridy = 0;
+        panelForm.add(spnKuantitas, gbcSpnKuantitas);
 
-        // Baris 1: Diskon % (JSpinner - memicu Method Overloading hitungBiaya)
-        gbc.gridx = 2; gbc.gridy = 1;
-        panelForm.add(new JLabel("Diskon (%):"), gbc);
-        gbc.gridx = 3;
+        // Spacer kanan agar form tidak melar saat jendela diperbesar
+        Component spacerKanan = Box.createHorizontalGlue();
+        GridBagConstraints gbcSpacer = new GridBagConstraints();
+        gbcSpacer.insets = new Insets(5, 10, 5, 10);
+        gbcSpacer.anchor = GridBagConstraints.WEST;
+        gbcSpacer.gridx = 4;
+        gbcSpacer.gridy = 0;
+        gbcSpacer.weightx = 1.0;
+        panelForm.add(spacerKanan, gbcSpacer);
+
+        // Kolom kanan baris 1: input diskon persen menggunakan JSpinner
+        JLabel lblDiskon = new JLabel("Diskon (%):");
+        GridBagConstraints gbcLblDiskon = new GridBagConstraints();
+        gbcLblDiskon.insets = new Insets(5, 10, 5, 10);
+        gbcLblDiskon.anchor = GridBagConstraints.WEST;
+        gbcLblDiskon.gridx = 2;
+        gbcLblDiskon.gridy = 1;
+        panelForm.add(lblDiskon, gbcLblDiskon);
+
         spnDiskon = new JSpinner(new SpinnerNumberModel(0.0, 0.0, 100.0, 5.0));
         spnDiskon.setPreferredSize(new Dimension(100, 25));
-        panelForm.add(spnDiskon, gbc);
+        GridBagConstraints gbcSpnDiskon = new GridBagConstraints();
+        gbcSpnDiskon.insets = new Insets(5, 10, 5, 10);
+        gbcSpnDiskon.anchor = GridBagConstraints.WEST;
+        gbcSpnDiskon.gridx = 3;
+        gbcSpnDiskon.gridy = 1;
+        panelForm.add(spnDiskon, gbcSpnDiskon);
 
-        // Baris 2: Layanan Tambahan (JCheckBox)
-        gbc.gridx = 2; gbc.gridy = 2;
-        panelForm.add(new JLabel("Layanan Tambahan:"), gbc);
-        gbc.gridx = 3;
+        // Kolom kanan baris 2: opsi layanan tambahan antar-jemput menggunakan JCheckBox
+        JLabel lblTambahan = new JLabel("Layanan Tambahan:");
+        GridBagConstraints gbcLblTambahan = new GridBagConstraints();
+        gbcLblTambahan.insets = new Insets(5, 10, 5, 10);
+        gbcLblTambahan.anchor = GridBagConstraints.WEST;
+        gbcLblTambahan.gridx = 2;
+        gbcLblTambahan.gridy = 2;
+        panelForm.add(lblTambahan, gbcLblTambahan);
+
         chkAntarJemput = new JCheckBox("Antar-Jemput (+Rp 5.000)");
-        panelForm.add(chkAntarJemput, gbc);
+        GridBagConstraints gbcChkAntarJemput = new GridBagConstraints();
+        gbcChkAntarJemput.insets = new Insets(5, 10, 5, 10);
+        gbcChkAntarJemput.anchor = GridBagConstraints.WEST;
+        gbcChkAntarJemput.gridx = 3;
+        gbcChkAntarJemput.gridy = 2;
+        panelForm.add(chkAntarJemput, gbcChkAntarJemput);
 
-        // Baris 3: Estimasi Biaya Real-Time
-        gbc.gridx = 2; gbc.gridy = 3;
-        panelForm.add(new JLabel("Estimasi Biaya:"), gbc);
-        gbc.gridx = 3;
+        // Kolom kanan baris 3: label estimasi biaya otomatis secara real-time
+        JLabel lblEstimasi = new JLabel("Estimasi Biaya:");
+        GridBagConstraints gbcLblEstimasi = new GridBagConstraints();
+        gbcLblEstimasi.insets = new Insets(5, 10, 5, 10);
+        gbcLblEstimasi.anchor = GridBagConstraints.WEST;
+        gbcLblEstimasi.gridx = 2;
+        gbcLblEstimasi.gridy = 3;
+        panelForm.add(lblEstimasi, gbcLblEstimasi);
+
         lblEstimasiBiaya = new JLabel("Rp 6.000");
         lblEstimasiBiaya.setFont(new Font("SansSerif", Font.BOLD, 14));
         lblEstimasiBiaya.setForeground(new Color(0, 102, 153));
-        panelForm.add(lblEstimasiBiaya, gbc);
+        GridBagConstraints gbcLblEstimasiBiaya = new GridBagConstraints();
+        gbcLblEstimasiBiaya.insets = new Insets(5, 10, 5, 10);
+        gbcLblEstimasiBiaya.anchor = GridBagConstraints.WEST;
+        gbcLblEstimasiBiaya.gridx = 3;
+        gbcLblEstimasiBiaya.gridy = 3;
+        panelForm.add(lblEstimasiBiaya, gbcLblEstimasiBiaya);
 
-        // Spacer kanan agar layout tetap ringkas dan tidak melar saat di-resize
-        gbc.gridx = 4; gbc.gridy = 0; gbc.weightx = 1.0;
-        panelForm.add(Box.createHorizontalGlue(), gbc);
-
-        // Panel Tombol Aksi (FlowLayout)
+        // Panel tombol aksi CRUD dengan FlowLayout
         JPanel panelTombol = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 8));
         btnTambah = new JButton("Tambah");
         btnUbah = new JButton("Ubah");
@@ -184,24 +309,28 @@ public class FormTransaksi extends JFrame {
 
         panelUtara.add(panelForm, BorderLayout.CENTER);
         panelUtara.add(panelTombol, BorderLayout.SOUTH);
-        add(panelUtara, BorderLayout.NORTH);
+        panelUtama.add(panelUtara, BorderLayout.NORTH);
 
-        // --- PANEL TENGAH (Pencarian + JTable Read-Only) ---
-
+        // Panel tengah menampung pencarian dan tabel transaksi
         JPanel panelTengah = new JPanel(new BorderLayout(5, 5));
         panelTengah.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
 
         JPanel panelCari = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 5));
-        panelCari.add(new JLabel("Cari Transaksi (ID/Nama/Tipe/Paket):"));
+        JLabel lblCari = new JLabel("Cari Transaksi (ID/Nama/Tipe/Paket):");
+        panelCari.add(lblCari);
         txtCari = new JTextField(24);
         panelCari.add(txtCari);
         panelTengah.add(panelCari, BorderLayout.NORTH);
 
+        // Anonymous subclass DefaultTableModel dengan Overridden return method agar tabel read-only
         String[] kolom = {
             "ID", "Pelanggan", "Tipe", "Paket", "Berat/Jml",
             "Antar-Jemput", "Diskon", "Total Biaya", "Estimasi"
         };
         modelTabel = new DefaultTableModel(kolom, 0) {
+            private static final long serialVersionUID = 1L;
+
+            // Overridden return method (public): mengembalikan false agar sel tabel tidak bisa diedit langsung
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -210,17 +339,15 @@ public class FormTransaksi extends JFrame {
 
         tabelTransaksi = new JTable(modelTabel);
         tabelTransaksi.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        panelTengah.add(new JScrollPane(tabelTransaksi), BorderLayout.CENTER);
+        JScrollPane scrollTabel = new JScrollPane(tabelTransaksi);
+        panelTengah.add(scrollTabel, BorderLayout.CENTER);
 
-        add(panelTengah, BorderLayout.CENTER);
+        panelUtama.add(panelTengah, BorderLayout.CENTER);
     }
 
-    /**
-     * [EVENT HANDLING TERPISAH]
-     * Seluruh listener memanggil method khusus tanpa menumpuk logika di dalam lambda.
-     */
+    // Void instance method (private) & Event Handling: mendaftarkan listener estimasi, CRUD, tabel, pencarian, dan menu bar
     private void pasangEvent() {
-        // Pembaruan estimasi biaya real-time saat komponen berubah
+        // Listener perubahan input untuk memperbarui estimasi biaya otomatis
         cbTipe.addActionListener(e -> perbaruiEstimasi());
         rbReguler.addActionListener(e -> perbaruiEstimasi());
         rbExpress.addActionListener(e -> perbaruiEstimasi());
@@ -228,31 +355,35 @@ public class FormTransaksi extends JFrame {
         spnDiskon.addChangeListener(e -> perbaruiEstimasi());
         chkAntarJemput.addActionListener(e -> perbaruiEstimasi());
 
-        // Tombol CRUD
+        // Listener tombol CRUD dan navigasi
         btnTambah.addActionListener(e -> tambahTransaksi());
         btnUbah.addActionListener(e -> ubahTransaksi());
         btnHapus.addActionListener(e -> hapusTransaksi());
         btnBersihkan.addActionListener(e -> bersihkanForm());
         btnKembali.addActionListener(e -> bukaMenuUtama());
 
-        // Seleksi baris tabel
+        // Listener seleksi baris tabel untuk mengisi ulang form input
         tabelTransaksi.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 isiFormDariTabel();
             }
         });
 
-        // Pencarian real-time
+        // Interface Implementation (DocumentListener) dengan 3 Overridden void method untuk pencarian real-time
         txtCari.getDocument().addDocumentListener(new DocumentListener() {
+            // Overridden void method (public): dipanggil saat karakter ditambahkan ke kolom cari
             @Override
             public void insertUpdate(DocumentEvent e) { cariData(); }
+
+            // Overridden void method (public): dipanggil saat karakter dihapus dari kolom cari
             @Override
             public void removeUpdate(DocumentEvent e) { cariData(); }
+
+            // Overridden void method (public): dipanggil saat atribut teks kolom cari berubah
             @Override
             public void changedUpdate(DocumentEvent e) { cariData(); }
         });
 
-        // Navigasi MenuBar
         itemMenuUtama.addActionListener(e -> bukaMenuUtama());
         itemPelanggan.addActionListener(e -> bukaFormPelanggan());
         itemLogOut.addActionListener(e -> prosesLogOut());
@@ -260,23 +391,33 @@ public class FormTransaksi extends JFrame {
         itemTentang.addActionListener(e -> tampilkanTentang());
     }
 
+    // Void instance method (private): mengisi pilihan JComboBox dari daftar pelanggan di controller
     private void muatComboPelanggan() {
+        if (controller == null) {
+            return;
+        }
         cbPelanggan.removeAllItems();
         for (Pelanggan p : controller.getDaftarPelanggan()) {
             cbPelanggan.addItem(p);
         }
     }
 
+    // Return instance method (private): mengembalikan teks paket ("Express" atau "Reguler") sesuai radio button terpilih
     private String getPaketTerpilih() {
         return rbExpress.isSelected() ? "Express" : "Reguler";
     }
 
+    // Return instance method (private): mengubah angka nominal menjadi teks format mata uang Rupiah
     private String formatRupiah(double nominal) {
         DecimalFormat formatter = new DecimalFormat("#,###", new DecimalFormatSymbols(Locale.forLanguageTag("id-ID")));
         return "Rp " + formatter.format(nominal);
     }
 
+    // Void instance method (private) & Exception Handling: menghitung dan menampilkan estimasi biaya real-time
     private void perbaruiEstimasi() {
+        if (controller == null) {
+            return;
+        }
         try {
             String tipe = cbTipe.getSelectedItem().toString();
             double kuantitas = ((Number) spnKuantitas.getValue()).doubleValue();
@@ -292,7 +433,7 @@ public class FormTransaksi extends JFrame {
         }
     }
 
-    // [METHOD CRUD - READ]
+    // Void instance method (private) & Generics: menampilkan List<Transaksi> ke JTable (CRUD Read)
     private void muatTabel(List<Transaksi> daftar) {
         modelTabel.setRowCount(0);
         for (Transaksi t : daftar) {
@@ -316,7 +457,11 @@ public class FormTransaksi extends JFrame {
         }
     }
 
+    // Void instance method (private): menyalin detail transaksi dari baris tabel yang diklik ke form input
     private void isiFormDariTabel() {
+        if (controller == null) {
+            return;
+        }
         int baris = tabelTransaksi.getSelectedRow();
         if (baris >= 0) {
             String idTrx = modelTabel.getValueAt(baris, 0).toString();
@@ -338,6 +483,7 @@ public class FormTransaksi extends JFrame {
         }
     }
 
+    // Void instance method (private): mencocokkan dan memilih item pelanggan di JComboBox berdasarkan ID
     private void pilihPelangganDiCombo(String idPelanggan) {
         for (int i = 0; i < cbPelanggan.getItemCount(); i++) {
             Pelanggan p = cbPelanggan.getItemAt(i);
@@ -348,8 +494,11 @@ public class FormTransaksi extends JFrame {
         }
     }
 
-    // [METHOD CRUD - CREATE]
+    // Void instance method (private) & Exception Handling: menambahkan transaksi baru lalu menyimpannya ke file (CRUD Create)
     private void tambahTransaksi() {
+        if (controller == null) {
+            return;
+        }
         Pelanggan pelanggan = (Pelanggan) cbPelanggan.getSelectedItem();
         if (pelanggan == null) {
             JOptionPane.showMessageDialog(this,
@@ -375,8 +524,11 @@ public class FormTransaksi extends JFrame {
         }
     }
 
-    // [METHOD CRUD - UPDATE]
+    // Void instance method (private) & Exception Handling: memperbarui transaksi yang dipilih di tabel (CRUD Update)
     private void ubahTransaksi() {
+        if (controller == null) {
+            return;
+        }
         int baris = tabelTransaksi.getSelectedRow();
         if (baris < 0) {
             JOptionPane.showMessageDialog(this, "Pilih baris transaksi pada tabel yang ingin diubah!");
@@ -406,8 +558,11 @@ public class FormTransaksi extends JFrame {
         }
     }
 
-    // [METHOD CRUD - DELETE dengan Konfirmasi]
+    // Void instance method (private) & Exception Handling: menghapus transaksi terpilih setelah konfirmasi (CRUD Delete)
     private void hapusTransaksi() {
+        if (controller == null) {
+            return;
+        }
         int baris = tabelTransaksi.getSelectedRow();
         if (baris < 0) {
             JOptionPane.showMessageDialog(this, "Pilih baris transaksi yang ingin dihapus!");
@@ -431,10 +586,15 @@ public class FormTransaksi extends JFrame {
         }
     }
 
+    // Void instance method (private): menyaring isi tabel transaksi sesuai kata kunci pencarian
     private void cariData() {
+        if (controller == null) {
+            return;
+        }
         muatTabel(controller.cariTransaksi(txtCari.getText()));
     }
 
+    // Void instance method (private): mengembalikan seluruh input form transaksi ke nilai awal
     private void bersihkanForm() {
         txtIdTransaksi.setText("(Otomatis)");
         if (cbPelanggan.getItemCount() > 0) {
@@ -449,16 +609,19 @@ public class FormTransaksi extends JFrame {
         perbaruiEstimasi();
     }
 
+    // Void instance method (private): membuka halaman Menu Utama dan menutup jendela ini
     private void bukaMenuUtama() {
         new MenuUtama(controller).setVisible(true);
         dispose();
     }
 
+    // Void instance method (private): berpindah ke halaman Kelola Data Pelanggan dan menutup jendela ini
     private void bukaFormPelanggan() {
         new FormPelanggan(controller).setVisible(true);
         dispose();
     }
 
+    // Void instance method (private): kembali ke halaman login setelah konfirmasi
     private void prosesLogOut() {
         int konfirmasi = JOptionPane.showConfirmDialog(this,
             "Apakah Anda yakin ingin Log Out?", "Konfirmasi Log Out", JOptionPane.YES_NO_OPTION);
@@ -468,6 +631,7 @@ public class FormTransaksi extends JFrame {
         }
     }
 
+    // Void instance method (private): menutup aplikasi setelah konfirmasi
     private void prosesKeluar() {
         int konfirmasi = JOptionPane.showConfirmDialog(this,
             "Yakin ingin menutup aplikasi?", "Konfirmasi Keluar", JOptionPane.YES_NO_OPTION);
@@ -476,6 +640,7 @@ public class FormTransaksi extends JFrame {
         }
     }
 
+    // Void instance method (private): menampilkan dialog informasi aplikasi dan anggota tim
     private void tampilkanTentang() {
         JOptionPane.showMessageDialog(this,
             "CleanWashApp v2.0 (Arsitektur MVC)\nDikembangkan oleh:\n- Yunita Dwi Ardilasari\n- Greycilfa\n- Rosita Salsabila",

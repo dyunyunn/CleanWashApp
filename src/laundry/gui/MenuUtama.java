@@ -1,26 +1,51 @@
 package laundry.gui;
 
-import laundry.controller.LaundryController;
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import laundry.controller.LaundryController;
 
-/**
- * [MVC - VIEW / HALAMAN 2]
- * Halaman Menu Utama / Dashboard yang menampilkan ringkasan statistik data
- * serta navigasi menuju halaman Kelola Pelanggan dan Kelola Transaksi.
- */
+// Inheritance: mewarisi JFrame untuk halaman Dashboard / Menu Utama (MVC - View halaman 2)
 public class MenuUtama extends JFrame {
+    private static final long serialVersionUID = 1L;
 
-    // [ATRIBUT]
+    // Encapsulation & Komposisi MVC: seluruh komponen GUI dan controller berakses private
     private final LaundryController controller;
-    private JLabel lblTotalPelanggan, lblTotalTransaksi, lblTotalPendapatan;
-    private JButton btnPelanggan, btnTransaksi, btnMuatUlang, btnLogOut;
-    private JMenuItem itemPelanggan, itemTransaksi, itemLogOut, itemKeluar, itemTentang;
+    private JLabel lblTotalPelanggan;
+    private JLabel lblTotalTransaksi;
+    private JLabel lblTotalPendapatan;
+    private JButton btnPelanggan;
+    private JButton btnTransaksi;
+    private JButton btnMuatUlang;
+    private JButton btnLogOut;
+    private JMenuItem itemPelanggan;
+    private JMenuItem itemTransaksi;
+    private JMenuItem itemLogOut;
+    private JMenuItem itemKeluar;
+    private JMenuItem itemTentang;
 
-    // [CONSTRUCTOR] Menerima objek LaundryController agar data antarhalaman tersinkronisasi
+    // Constructor default (Overloading & Chaining): memanggil konstruktor utama dengan null agar kompatibel WindowBuilder
+    public MenuUtama() {
+        this(null);
+    }
+
+    // Constructor berparameter (Overloading): menerima LaundryController agar data antarhalaman tersinkronisasi
     public MenuUtama(LaundryController controller) {
         this.controller = controller;
         inisialisasiGUI();
@@ -28,15 +53,15 @@ public class MenuUtama extends JFrame {
         perbaruiRingkasan();
     }
 
+    // Void instance method (private): menyusun antarmuka Dashboard dengan JMenuBar, BorderLayout, GridLayout, dan FlowLayout
     private void inisialisasiGUI() {
         setTitle("Menu Utama - CleanWashApp");
         setSize(700, 400);
         setMinimumSize(new Dimension(600, 350));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setLayout(new BorderLayout(10, 10));
 
-        // --- [JMenuBar KONSISTEN ANTARHALAMAN] ---
+        // Menu bar navigasi yang konsisten antarhalaman
         JMenuBar menuBar = new JMenuBar();
 
         JMenu menuNavigasi = new JMenu("Menu");
@@ -59,7 +84,11 @@ public class MenuUtama extends JFrame {
         menuBar.add(menuBantuan);
         setJMenuBar(menuBar);
 
-        // --- HEADER (NORTH) ---
+        // Panel utama dengan BorderLayout
+        JPanel panelUtama = new JPanel(new BorderLayout(10, 10));
+        setContentPane(panelUtama);
+
+        // Area header judul di bagian atas (NORTH)
         JPanel panelHeader = new JPanel(new BorderLayout());
         panelHeader.setBorder(BorderFactory.createEmptyBorder(20, 25, 10, 25));
 
@@ -70,22 +99,57 @@ public class MenuUtama extends JFrame {
 
         panelHeader.add(lblJudul, BorderLayout.NORTH);
         panelHeader.add(lblSub, BorderLayout.SOUTH);
-        add(panelHeader, BorderLayout.NORTH);
+        panelUtama.add(panelHeader, BorderLayout.NORTH);
 
-        // --- PANEL KARTU STATISTIK (CENTER dengan GridLayout 1x3) ---
+        // Area 3 kartu ringkasan statistik di tengah (CENTER) dengan GridLayout 1x3
         JPanel panelStatistik = new JPanel(new GridLayout(1, 3, 15, 15));
         panelStatistik.setBorder(BorderFactory.createEmptyBorder(15, 25, 15, 25));
 
+        // Kartu 1: menampilkan jumlah total pelanggan
+        JPanel kartuPelanggan = new JPanel(new BorderLayout(5, 10));
+        kartuPelanggan.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1),
+            BorderFactory.createEmptyBorder(15, 10, 15, 10)
+        ));
+        JLabel lblJudulPelanggan = new JLabel("Total Pelanggan", SwingConstants.CENTER);
+        lblJudulPelanggan.setFont(new Font("SansSerif", Font.PLAIN, 13));
         lblTotalPelanggan = new JLabel("0", SwingConstants.CENTER);
+        lblTotalPelanggan.setFont(new Font("SansSerif", Font.BOLD, 20));
+        kartuPelanggan.add(lblJudulPelanggan, BorderLayout.NORTH);
+        kartuPelanggan.add(lblTotalPelanggan, BorderLayout.CENTER);
+        panelStatistik.add(kartuPelanggan);
+
+        // Kartu 2: menampilkan jumlah total transaksi
+        JPanel kartuTransaksi = new JPanel(new BorderLayout(5, 10));
+        kartuTransaksi.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1),
+            BorderFactory.createEmptyBorder(15, 10, 15, 10)
+        ));
+        JLabel lblJudulTransaksi = new JLabel("Total Transaksi", SwingConstants.CENTER);
+        lblJudulTransaksi.setFont(new Font("SansSerif", Font.PLAIN, 13));
         lblTotalTransaksi = new JLabel("0", SwingConstants.CENTER);
+        lblTotalTransaksi.setFont(new Font("SansSerif", Font.BOLD, 20));
+        kartuTransaksi.add(lblJudulTransaksi, BorderLayout.NORTH);
+        kartuTransaksi.add(lblTotalTransaksi, BorderLayout.CENTER);
+        panelStatistik.add(kartuTransaksi);
+
+        // Kartu 3: menampilkan akumulasi total pendapatan
+        JPanel kartuPendapatan = new JPanel(new BorderLayout(5, 10));
+        kartuPendapatan.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1),
+            BorderFactory.createEmptyBorder(15, 10, 15, 10)
+        ));
+        JLabel lblJudulPendapatan = new JLabel("Total Pendapatan", SwingConstants.CENTER);
+        lblJudulPendapatan.setFont(new Font("SansSerif", Font.PLAIN, 13));
         lblTotalPendapatan = new JLabel("Rp 0", SwingConstants.CENTER);
+        lblTotalPendapatan.setFont(new Font("SansSerif", Font.BOLD, 20));
+        kartuPendapatan.add(lblJudulPendapatan, BorderLayout.NORTH);
+        kartuPendapatan.add(lblTotalPendapatan, BorderLayout.CENTER);
+        panelStatistik.add(kartuPendapatan);
 
-        panelStatistik.add(buatKartu("Total Pelanggan", lblTotalPelanggan));
-        panelStatistik.add(buatKartu("Total Transaksi", lblTotalTransaksi));
-        panelStatistik.add(buatKartu("Total Pendapatan", lblTotalPendapatan));
-        add(panelStatistik, BorderLayout.CENTER);
+        panelUtama.add(panelStatistik, BorderLayout.CENTER);
 
-        // --- PANEL TOMBOL NAVIGASI (SOUTH dengan FlowLayout) ---
+        // Area tombol navigasi di bagian bawah (SOUTH) dengan FlowLayout
         JPanel panelTombol = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 20));
         btnPelanggan = new JButton("Kelola Pelanggan");
         btnTransaksi = new JButton("Kelola Transaksi");
@@ -96,30 +160,10 @@ public class MenuUtama extends JFrame {
         panelTombol.add(btnTransaksi);
         panelTombol.add(btnMuatUlang);
         panelTombol.add(btnLogOut);
-        add(panelTombol, BorderLayout.SOUTH);
+        panelUtama.add(panelTombol, BorderLayout.SOUTH);
     }
 
-    /**
-     * [METHOD BANTUAN GUI] Membuat panel kartu statistik yang seragam.
-     */
-    private JPanel buatKartu(String judul, JLabel labelNilai) {
-        JPanel kartu = new JPanel(new BorderLayout(5, 10));
-        kartu.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1),
-            BorderFactory.createEmptyBorder(15, 10, 15, 10)
-        ));
-
-        JLabel lblJudulKartu = new JLabel(judul, SwingConstants.CENTER);
-        lblJudulKartu.setFont(new Font("SansSerif", Font.PLAIN, 13));
-
-        labelNilai.setFont(new Font("SansSerif", Font.BOLD, 20));
-
-        kartu.add(lblJudulKartu, BorderLayout.NORTH);
-        kartu.add(labelNilai, BorderLayout.CENTER);
-        return kartu;
-    }
-
-    // [EVENT HANDLING TERPISAH]
+    // Void instance method (private) & Event Handling: menghubungkan tombol dan item menu ke ActionListener
     private void pasangEvent() {
         btnPelanggan.addActionListener(e -> bukaFormPelanggan());
         itemPelanggan.addActionListener(e -> bukaFormPelanggan());
@@ -136,29 +180,40 @@ public class MenuUtama extends JFrame {
         itemTentang.addActionListener(e -> tampilkanTentang());
     }
 
+    // Void instance method (private): mengambil dan memformat angka ringkasan statistik dari controller
     private void perbaruiRingkasan() {
+        if (controller == null) {
+            return;
+        }
         DecimalFormat formatter = new DecimalFormat("#,###", new DecimalFormatSymbols(Locale.forLanguageTag("id-ID")));
         lblTotalPelanggan.setText(String.valueOf(controller.getTotalPelanggan()));
         lblTotalTransaksi.setText(String.valueOf(controller.getTotalTransaksi()));
         lblTotalPendapatan.setText("Rp " + formatter.format(controller.getTotalPendapatan()));
     }
 
+    // Void instance method (private): memuat ulang data dari file .txt lalu menyegarkan kartu statistik
     private void muatUlangData() {
+        if (controller == null) {
+            return;
+        }
         controller.muatSemuaData();
         perbaruiRingkasan();
         JOptionPane.showMessageDialog(this, "Ringkasan data berhasil diperbarui!");
     }
 
+    // Void instance method (private): membuka halaman Kelola Data Pelanggan dan menutup jendela ini
     private void bukaFormPelanggan() {
         new FormPelanggan(controller).setVisible(true);
         dispose();
     }
 
+    // Void instance method (private): membuka halaman Kelola Transaksi Laundry dan menutup jendela ini
     private void bukaFormTransaksi() {
         new FormTransaksi(controller).setVisible(true);
         dispose();
     }
 
+    // Void instance method (private): menampilkan konfirmasi lalu kembali ke halaman login
     private void prosesLogOut() {
         int konfirmasi = JOptionPane.showConfirmDialog(this,
             "Apakah Anda yakin ingin Log Out?", "Konfirmasi Log Out", JOptionPane.YES_NO_OPTION);
@@ -168,6 +223,7 @@ public class MenuUtama extends JFrame {
         }
     }
 
+    // Void instance method (private): menampilkan konfirmasi lalu menghentikan aplikasi
     private void prosesKeluar() {
         int konfirmasi = JOptionPane.showConfirmDialog(this,
             "Yakin ingin menutup aplikasi?", "Konfirmasi Keluar", JOptionPane.YES_NO_OPTION);
@@ -176,14 +232,14 @@ public class MenuUtama extends JFrame {
         }
     }
 
+    // Void instance method (private): menampilkan dialog informasi versi dan pengembang aplikasi
     private void tampilkanTentang() {
         JOptionPane.showMessageDialog(this,
             "CleanWashApp v2.0 (Arsitektur MVC)\n" +
             "Dikembangkan oleh:\n" +
-            "- Yuni\n" +
-            "- Grey\n" +
-            "- Rosi",
+            "- Yunita Dwi Ardilasari\n" +
+            "- Greycilfa\n" +
+            "- Rosita Salsabila",
             "Tentang CleanWashApp", JOptionPane.INFORMATION_MESSAGE);
     }
 }
-

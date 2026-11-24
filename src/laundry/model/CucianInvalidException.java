@@ -1,13 +1,12 @@
 package laundry.model;
 
-/**
- * [CUSTOM EXCEPTION]
- * Exception khusus untuk menangani kesalahan input bisnis pada aplikasi CleanWashApp
- * (seperti nama kosong, berat <= 0, nomor HP tidak valid, atau diskon di luar 0-100%).
- */
+// Custom Exception & Inheritance: mewarisi Exception untuk menangani error validasi input bisnis laundry
 public class CucianInvalidException extends Exception {
 
-    // [CONSTRUCTOR] Meneruskan pesan error ke kelas induk Exception
+    // Konstanta serialisasi (private static final): menghilangkan peringatan warning di Eclipse
+    private static final long serialVersionUID = 1L;
+
+    // Constructor berparameter (public): meneruskan pesan error ke kelas induk Exception lewat super()
     public CucianInvalidException(String pesan) {
         super(pesan);
     }
